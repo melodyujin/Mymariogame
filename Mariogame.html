@@ -7,24 +7,20 @@
     <style>
         #wrapper{
             width: 1000px;
-            height: 1000px;
+            height: 750px;
             margin: auto;
             position: relative;
             overflow: hidden;
-
+            background: lightskyblue;
         }
         #header{
             width: 100%;
-            height: 60px;
-            background: lightskyblue;
-        }
-        #stage{
-            width: 100%;
-            height: 640px;
+            height: 50px;
             background: lightskyblue;
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="../js/lib.js"></script>
     <script src="./GameObject.js"></script>
     <script src="./Map1.js"></script>
     <script src="./Brick.js"></script>
@@ -36,12 +32,18 @@
     <script src="Pil.js"></script>
     <script src="./Coin.js"></script>
     <script src="./Castle.js"></script>
-    <script src="../js/lib.js"></script>
+    <script src="./Sensor.js"></script>
+    <script src="./LeftSensor.js"></script>
+    <script src="./RightSensor.js"></script>
+    <script src="./TopSensor.js"></script>
+    <script src="./BottomSensor.js"></script>
     <script>
         let wrapper;
         let header;
         let stage;
         let mario;
+        let g=0.05;
+        let flag=true;
         let score=0;
         let brickArray=[];
         let grassArray=[];
@@ -52,6 +54,9 @@
         let coinArray=[];
         let castleArray=[];
 
+        let bgX=0;
+        let isRight=true;
+
         function createBrick(){
             //container, width, height, x, y, velX,velY
             for(let a=0;a<map1.length;a++){
@@ -60,7 +65,7 @@
                         let brick=new Brick(stage,"./images/brick.png",50,50,i*50,a*50,0,0);
                         brickArray.push(brick);
                     }else if(map1[a][i]==2){ //마리오
-                        mario=new Mario(stage, "./images/mario.png",100,100,i*50,a*50,0,0);
+                        mario=new Mario(stage, "./images/mario.png",75,75,i*50,a*50,0,0);
                     }else if(map1[a][i]==3){ //풀
                         let grass=new Grass(stage, "./images/grass.png", 60,60,i*50,a*50,0,0);
                         grassArray.push(grass);
@@ -88,21 +93,49 @@
         }
         
         function jump(){
-
+            mario.velY=-4;
         }
         function moveX(n){
             mario.velX=n
         }
+        function bgEffect(){
+            if(mario.velX!=0 && mario.x<400 && isRight==false){
+                bgX++;
+                isRight=false;
+            }
+            if(mario.velX!=0 && mario.x>600 && isRight==true){
+                bgX--;
+                isRight=true;
+            }
+         
+            stage.style.left=bgX+"px";
+
+        }
+        function bgInit(){
+            stage.style.width=100+"%";
+            stage.style.height=700+"px";
+            stage.style.background="lightsky";
+            stage.style.position="absolute";
+        }
+        function setInfo(){
+            header.innerText=score;
+        }
         function loop(){
             //console.log("loop()...")
-            mario.tick();
-            mario.render();
+            if(flag){
+                mario.tick();
+                mario.render();
+            };
+            
+            bgEffect();
         }
         function init(){
             wrapper=document.getElementById("wrapper");
             header=document.getElementById("header");
             stage=document.getElementById("stage");
 
+            bgInit();
+            setInfo();
             createBrick();
         }
 
@@ -112,6 +145,7 @@
 
             $(document.body).on("keydown", function(e){
                 switch(e.keyCode){
+                    case 27:flag=!flag;break; //esc
                     case 32:jump();break; //점프
                     case 37:moveX(-3);break; //좌
                     case 39:moveX(3);break; //우

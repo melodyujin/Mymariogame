@@ -6,7 +6,7 @@ class Sensor{
         this.height=height;
         this.x=x;
         this.y=y;
-        this.bg;
+        this.bg=bg;
 
         this.div=document.createElement("div");
         this.div.style.width=this.width+"px";
